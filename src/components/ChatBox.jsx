@@ -11,7 +11,7 @@ const ChatBox = () => {
         "how are you": "I'm just a bot, but I'm doing great! How about you?",
         "bye": "Goodbye! Have a great day!",
         "integer": "Please enter a list of integers(comma separated) e.g: 7,93,2 or 8",
-        "default": "I'm not sure how to respond to that. Can you try something else?"
+        "default": "I'm sorry, I didn't understand that. Can you rephrase?"
     }
 
     const [input, setInput] = useState("")
