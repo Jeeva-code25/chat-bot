@@ -1,0 +1,44 @@
+.chat-sec{
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.bot-chat{
+    background-color: blueviolet;
+    color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+}
+.user-chat{
+    
+    background-color: rgb(195, 16, 211);
+    color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-left: auto;
+
+}
+
+.chat{
+    display: flex;
+    width: 85%;
+    align-items: baseline;
+    gap: .5rem;
+}
+
+.icon{
+    text-wrap: nowrap;
+    font-size: 1.5em;
+    font-weight: 400;
+}
+
+@media only screen and (max-width: 480px){
+    .icon{
+        font-size: 1em;
+
+    }
+    .text{
+        font-size: .8em;
+    }
+}
