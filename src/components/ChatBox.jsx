@@ -233,10 +233,9 @@ const ChatBox = () => {
             message = message.toLowerCase()
             const searchChat = history.filter(value => { return (value.user.toLowerCase().includes(message)) })
             
-            let printSearch = searchChat.reduce((acc, curr) => acc + "\n-Chat Bot: " + curr.bot, `\n-User: ${searchChat[0].user}\n`)
-
 
             if (searchChat.length > 0) {
+                let printSearch = searchChat.reduce((acc, curr) => acc +`\n-User: ${curr.user}`+ "\n-Chat Bot: " + curr.bot, "")
                 setChatList(prevList => [...prevList, { "who": "bot", "text": `Found the following lines: ${printSearch}` }])
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "How else can I assist you?" }])
             } else {
