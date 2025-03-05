@@ -300,8 +300,7 @@ const ChatBox = () => {
                         "who": "bot", "text": "Do you want to save this summary?(yes/no)",
                     }])                
             } else {
-                setChatList(prevList => [...prevList, { "who": "bot", "text": "No operation found!" }])
-                setChatList(prevList => [...prevList, { "who": "bot", "text": "How else can I assist you?" }])
+                setChatList(prevList => [...prevList, { "who": "bot", "text": "Goodbye! Have a great day!" }])
                 setOperation("")
                 return
             }
@@ -316,7 +315,7 @@ const ChatBox = () => {
                 }
                
             } else if(message === "no" && currentOperation){
-                setChatList(prevList => [...prevList, { "who": "bot", "text": "How else can I assist you?" }])
+                setChatList(prevList => [...prevList, { "who": "bot", "text": "Goodbye! Have a great day!" }])
                 setOperation("")
 
             } else if(currentOperation) {
