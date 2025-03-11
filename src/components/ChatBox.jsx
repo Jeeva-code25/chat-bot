@@ -23,17 +23,17 @@ const ChatBox = () => {
 
     }, [chatList]);
 
-    // Call manipulate list when numbers state changes
+    // Call manipulateList() when numbers state changes
     useEffect(() => {
         if (numbers.length > 0) {
 
-            if(isRemoveDuplicate) setChatList(prevList => [...prevList, {
+            if (isRemoveDuplicate) setChatList(prevList => [...prevList, {
                 "who": "bot", "text": `Updated List:[ ${numbers}]`
             }])
 
             manipulateList()
 
-            if (findDuplicates().length > 0) {
+            if (findDuplicates().size > 0) {
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "would you like to remove duplicates? yes/no" }])
                 setIsRemoveDuplicate(true)
             } else {
@@ -62,36 +62,42 @@ const ChatBox = () => {
     }
 
     function findDuplicates() {
-        let seen = new Set();
-        let duplicates = new Set();
+        const countMap = new Map();
+        const duplicates = new Map();
+        numbers.forEach(num => countMap.set(num, (countMap.get(num) || 0) + 1));
 
-        if (numbers.length > 0) {
-            for (let num of numbers) {
-                if (seen.has(num)) {
-                    duplicates.add(num); // If already seen, it's a duplicate
-                } else {
-                    seen.add(num);
-                }
+        countMap.forEach((value, key) => {
+            if (value > 1) {
+                duplicates.set(key, value)
             }
-        }
+        })
+        // let seen = new Set();
+
+        // let duplicates = new Set();
+
+        // if (numbers.length > 0) {
+        //     for (let num of numbers) {
+        //         if (seen.has(num)) {
+        //             duplicates.add(num); // If already seen, it's a duplicate
+        //         } else {
+        //             seen.add(num);
+        //         }
+        //     }
+        // }
 
 
-        return [...duplicates]; // Convert Set to Array
+        return duplicates; // Convert Set to Array
     }
 
     function removeFirstOccurrenceOfDuplicates() {
-        const countMap = new Map(); // Step 1: Create a Map to store counts
 
-        // Step 2: Count occurrences of each number
-        numbers.forEach(num => countMap.set(num, (countMap.get(num) || 0) + 1));
-
-        const seen = new Set(); // Step 3: Track first duplicate removals
+        const seen = new Set(); 
         return numbers.filter(num => {
-            if (countMap.get(num) > 1 && !seen.has(num)) {
-                seen.add(num); // Step 4: Mark first occurrence for removal
-                return false;  // Step 5: Remove this first occurrence
+            if (!seen.has(num)) {
+                seen.add(num); 
+                return true;
             }
-            return true; // Step 6: Keep the rest of the elements
+            return false; 
         });
     }
 
@@ -150,6 +156,11 @@ const ChatBox = () => {
 
         //Remove Duplicate elements
         if (message === 'yes' && isRemoveDuplicate) {
+            let duplicates = "";
+            findDuplicates().forEach((value, key) => {
+                duplicates += `\n${key} occurred in ${value} times`
+            })
+            setChatList(prevList => [...prevList, { "who": "bot", "text": `Removed Duplicates: ${duplicates}` }])
             setNumbers((value) => { return removeFirstOccurrenceOfDuplicates() })
             setHistory(prevList => [...prevList, { "user": "list operations", "bot": "would you like to remove duplicates? yes" }])
 
@@ -232,10 +243,10 @@ const ChatBox = () => {
         if (message.length > 0) {
             message = message.toLowerCase()
             const searchChat = history.filter(value => { return (value.user.toLowerCase().includes(message)) })
-            
+
 
             if (searchChat.length > 0) {
-                let printSearch = searchChat.reduce((acc, curr) => acc +`\n-User: ${curr.user}`+ "\n-Chat Bot: " + curr.bot, "")
+                let printSearch = searchChat.reduce((acc, curr) => acc + `\n-User: ${curr.user}` + "\n-Chat Bot: " + curr.bot, "")
                 setChatList(prevList => [...prevList, { "who": "bot", "text": `Found the following lines: ${printSearch}` }])
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "How else can I assist you?" }])
             } else {
@@ -273,7 +284,7 @@ const ChatBox = () => {
             suggestedName: "chatbot_summary.txt",
             types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
         };
-    
+
         try {
             const fileHandle = await window.showSaveFilePicker(options);
             const writableStream = await fileHandle.createWritable();
@@ -288,37 +299,37 @@ const ChatBox = () => {
     }
 
     const byeOperation = (message) => {
-        
+
         if (message.length > 0) {
             setOperation("bye operation")
 
             if (history.length > 0) {
                 const operation = history.filter(item => !item.bot.includes("would you like to"))
                 setChatList(prevList => [...prevList, { "who": "bot", "text": `Here's a summary of your session:\n-Commands used: ${operation.length}\n-Most frequent command: ${findFrequentCommand().user}` }])
-                
-                    setChatList(prevList => [...prevList, {
-                        "who": "bot", "text": "Do you want to save this summary?(yes/no)",
-                    }])                
+
+                setChatList(prevList => [...prevList, {
+                    "who": "bot", "text": "Do you want to save this summary?(yes/no)",
+                }])
             } else {
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "Goodbye! Have a great day!" }])
                 setOperation("")
                 return
             }
 
-            if(message === "yes" && currentOperation){
+            if (message === "yes" && currentOperation) {
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "Goodbye! Have a great day!" }])
-                let summary = history.map((item, index) => `${index+1}. User: ${item.user}\nChatBot: ${item.bot.replace(/\n/g, "")}`).join("\n")
-                if(saveFile(summary)){
+                let summary = history.map((item, index) => `${index + 1}. User: ${item.user}\nChatBot: ${item.bot.replace(/\n/g, "")}`).join("\n")
+                if (saveFile(summary)) {
                     setOperation("")
                 } else {
                     console.log("failed");
                 }
-               
-            } else if(message === "no" && currentOperation){
+
+            } else if (message === "no" && currentOperation) {
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "Goodbye! Have a great day!" }])
                 setOperation("")
 
-            } else if(currentOperation) {
+            } else if (currentOperation) {
                 setChatList(prevList => [...prevList, { "who": "bot", "text": "Keyword mistmatch: Enter yes or no only" }])
             }
 
